@@ -1,5 +1,5 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
-import { TCourse } from "../courses/course.modules";
+import { TCourse } from "./course.models";
 
 export type TStudent = Document & {
   firstName: string;
@@ -8,9 +8,11 @@ export type TStudent = Document & {
   email: string;
   phone: string;
   password: string;
+  gender: string;
   role: string;
   address: string;
   avatar: string;
+  qualification: string;
   enrolledCourses: TCourse["_id"][];
 };
 
@@ -25,7 +27,7 @@ const studentSchema: Schema<TStudent> = new Schema(
       lowercase: true,
       minlength: 5,
     },
-    email: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true, lowercase: true },
     phone: {
       type: String,
       required: true,
@@ -34,9 +36,15 @@ const studentSchema: Schema<TStudent> = new Schema(
       maxlength: 15,
     },
     password: { type: String, required: true, minlength: 8 },
+    gender: { type: String, required: true, enum: ["M", "F", "O"] },
     role: { type: String, required: true, default: "student" },
     avatar: { type: String, required: true, default: "avatar.webp" },
     address: { type: String, required: true },
+    qualification: {
+      type: String,
+      required: true,
+      enum: ["X", "XII", "UG", "PG"],
+    },
     enrolledCourses: [
       {
         type: Schema.Types.ObjectId,

@@ -1,30 +1,28 @@
-import express, { Application, NextFunction, Request, Response } from "express";
-import mongoose from "mongoose";
-import { MONGOOSE_URL, PORT } from "./config";
-import courseRoutes from "./routes/course.routes";
-import studentRoutes from "./routes/student.routes";
+import { Request, Response } from "express";
+import "dotenv/config";
+import { PORT } from "./config";
+import connectDb from "./db";
+import { app } from "./app";
 
-const app: Application = express();
 const port = PORT || 3001;
-const db_URI = MONGOOSE_URL || "";
 
-mongoose
-  .connect(`${db_URI}`)
-  .then(() => console.log("DB Connected Successfully"))
-  .catch((err) => console.log(err));
-
-//express built-in middlewares
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Connect to DB & Start Listening on PORT
+connectDb()
+  .then(() => {
+    app.on("error", (error) => {
+      console.log(
+        `Error!!! Application is not able to talk to Database: ${error}`
+      );
+      throw error;
+    });
+    app.listen(port, () => {
+      console.log(`Learnopia Server is running on port: ${port}`);
+    });
+  })
+  .catch((error) => {
+    console.log(`DATABASE Connection Failed !!: ${error}`);
+  });
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Welcome to Learnopia");
-});
-
-app.use("/api", studentRoutes);
-
-app.use("/api", courseRoutes);
-
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
 });

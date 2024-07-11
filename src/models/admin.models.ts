@@ -7,6 +7,7 @@ export type TAdmin = Document & {
   email: string;
   phone: string;
   password: string;
+  gender: string;
   role: string;
   address: string;
   avatar: string;
@@ -31,6 +32,7 @@ const adminSchema: Schema<TAdmin> = new Schema({
     unique: true,
   },
   password: { type: String, required: true, minlength: 8 },
+  gender: { type: String, required: true, enum: ["M", "F", "O"] },
   role: { type: String, required: true, default: "admin" },
   address: { type: String, required: true },
   avatar: { type: String, required: true, default: "avatar.webp" },
