@@ -1,5 +1,5 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
-import { TCourse } from "../courses/course.modules";
+import { TCourse } from "./course.models";
 
 export type TStudent = Document & {
   firstName: string;
@@ -25,7 +25,7 @@ const studentSchema: Schema<TStudent> = new Schema(
       lowercase: true,
       minlength: 5,
     },
-    email: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true, lowercase: true },
     phone: {
       type: String,
       required: true,
