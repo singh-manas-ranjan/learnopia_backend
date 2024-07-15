@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema, Model } from "mongoose";
+import { TReview } from "./review.models";
 
 export type TCourseContent = {
   sectionName: string;
@@ -22,6 +23,7 @@ export type TCourse = Document & {
   courseLink: string;
   courseIndex: TCourseContent[];
   courseResources: TCourseResource[];
+  reviews?: TReview["_id"][];
 };
 
 const courseSchema: Schema<TCourse> = new Schema(
@@ -55,6 +57,12 @@ const courseSchema: Schema<TCourse> = new Schema(
       required: true,
       default: [],
     },
+    reviews: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Review",
+      },
+    ],
   },
   { timestamps: true }
 );

@@ -2,9 +2,45 @@ import { Request, Response } from "express";
 import Student, { TStudent } from "../models/student.models";
 
 const registerStudent = async (req: Request, res: Response) => {
-  const body: TStudent = req.body;
+  const {
+    firstName,
+    lastName,
+    email,
+    username,
+    password,
+    phone,
+    gender,
+    qualification,
+  }: TStudent = req.body;
+  if (
+    [
+      firstName,
+      lastName,
+      email,
+      username,
+      password,
+      phone,
+      gender,
+      qualification,
+    ].some((field) => field?.trim() === "")
+  ) {
+    return res
+      .status(400)
+      .json({ success: false, message: "All fields are required" });
+  }
+
+  const isStudentExists = await Student.findOne({
+    $or: [{ username }, { email }, { phone }],
+  }).exec();
+
+  if (isStudentExists) {
+    return res
+      .status(409)
+      .json({ success: false, message: "Student already exists" });
+  }
+
   try {
-    const newStudent = await Student.create(body);
+    const newStudent = await Student.create(req.body);
     res.status(201).json({
       success: true,
       message: "Student Created Successfully",
