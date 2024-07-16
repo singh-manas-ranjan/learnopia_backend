@@ -24,7 +24,6 @@ const studentSchema: Schema<TStudent> = new Schema(
       type: String,
       required: true,
       unique: true,
-      lowercase: true,
       minlength: 5,
     },
     email: { type: String, required: true, unique: true, lowercase: true },

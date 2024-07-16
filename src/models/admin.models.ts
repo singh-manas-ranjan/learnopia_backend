@@ -21,7 +21,6 @@ const adminSchema: Schema<TAdmin> = new Schema({
     required: true,
     minlength: 5,
     unique: true,
-    lowercase: true,
   },
   email: { type: String, required: true, lowercase: true, unique: true },
   phone: {
