@@ -36,13 +36,12 @@ const studentSchema: Schema<TStudent> = new Schema(
       maxlength: 15,
     },
     password: { type: String, required: true, minlength: 8 },
-    gender: { type: String, required: true, enum: ["M", "F", "O"] },
+    gender: { type: String, enum: ["M", "F", "O"] },
     role: { type: String, required: true, default: "student" },
     avatar: { type: String, required: true, default: "avatar.webp" },
-    address: { type: String, required: true },
+    address: { type: String },
     qualification: {
       type: String,
-      required: true,
       enum: ["X", "XII", "UG", "PG"],
     },
     enrolledCourses: [

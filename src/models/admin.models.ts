@@ -32,9 +32,9 @@ const adminSchema: Schema<TAdmin> = new Schema({
     unique: true,
   },
   password: { type: String, required: true, minlength: 8 },
-  gender: { type: String, required: true, enum: ["M", "F", "O"] },
+  gender: { type: String, enum: ["M", "F", "O"] },
   role: { type: String, required: true, default: "admin" },
-  address: { type: String, required: true },
+  address: { type: String },
   avatar: { type: String, required: true, default: "avatar.webp" },
 });
 
