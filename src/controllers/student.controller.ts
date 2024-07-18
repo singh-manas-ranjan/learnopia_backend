@@ -153,12 +153,15 @@ const deleteStudent = async (req: Request, res: Response) => {
 const getStudentProfile = async (req: Request, res: Response) => {
   const id = req.params.id;
   try {
-    const student = await Student.findById(id, {
-      createdAt: 0,
-      updatedAt: 0,
-      enrolledCourses: 0,
-      role: 0,
-    }).exec();
+    const student = await Student.find(
+      { _id: id },
+      {
+        createdAt: 0,
+        updatedAt: 0,
+        enrolledCourses: 0,
+        password: 0,
+      }
+    ).exec();
     if (!student) {
       return res
         .status(404)
