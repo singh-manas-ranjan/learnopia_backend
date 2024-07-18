@@ -2,17 +2,10 @@ import Admin, { TAdmin } from "../models/admin.models";
 import { Request, Response } from "express";
 
 const registerAdmin = async (req: Request, res: Response) => {
-  const {
-    firstName,
-    lastName,
-    email,
-    username,
-    password,
-    phone,
-    gender,
-  }: TAdmin = req.body;
+  const { firstName, lastName, email, username, password, phone }: TAdmin =
+    req.body;
   if (
-    [firstName, lastName, email, username, password, phone, gender].some(
+    [firstName, lastName, email, username, password, phone].some(
       (field) => field.trim() === ""
     )
   ) {

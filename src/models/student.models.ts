@@ -50,7 +50,7 @@ const studentSchema: Schema<TStudent> = new Schema(
       },
     ],
   },
-  { timestamps: true }
+  { timestamps: true, versionKey: false }
 );
 
 const Student: Model<TStudent> = mongoose.model("Student", studentSchema);

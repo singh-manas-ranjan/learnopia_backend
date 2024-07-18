@@ -150,6 +150,29 @@ const deleteStudent = async (req: Request, res: Response) => {
   }
 };
 
+const getStudentProfile = async (req: Request, res: Response) => {
+  const id = req.params.id;
+  try {
+    const student = await Student.findById(id, {
+      createdAt: 0,
+      updatedAt: 0,
+      enrolledCourses: 0,
+      role: 0,
+    }).exec();
+    if (!student) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Student Not Found" });
+    }
+    res
+      .status(200)
+      .json({ success: true, message: "Student Profile", body: student });
+  } catch (error) {
+    console.log(`ERROR !! getStudentProfile: ${error} `);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
 export {
   registerStudent,
   studentLogin,
@@ -157,4 +180,5 @@ export {
   getStudentList,
   updateStudent,
   deleteStudent,
+  getStudentProfile,
 };

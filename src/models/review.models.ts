@@ -11,7 +11,7 @@ const reviewSchema: Schema<TReview> = new Schema(
     body: { type: String, required: true },
     student: [{ type: Schema.Types.ObjectId, ref: "Student", required: true }],
   },
-  { timestamps: true }
+  { timestamps: true, versionKey: false }
 );
 
 const Review: Model<TReview> = mongoose.model("Review", reviewSchema);

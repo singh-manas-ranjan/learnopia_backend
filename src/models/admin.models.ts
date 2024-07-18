@@ -13,29 +13,32 @@ export type TAdmin = Document & {
   avatar: string;
 };
 
-const adminSchema: Schema<TAdmin> = new Schema({
-  firstName: { type: String, required: true, minlength: 3 },
-  lastName: { type: String, required: true, minlength: 3 },
-  username: {
-    type: String,
-    required: true,
-    minlength: 5,
-    unique: true,
+const adminSchema: Schema<TAdmin> = new Schema(
+  {
+    firstName: { type: String, required: true, minlength: 3 },
+    lastName: { type: String, required: true, minlength: 3 },
+    username: {
+      type: String,
+      required: true,
+      minlength: 5,
+      unique: true,
+    },
+    email: { type: String, required: true, lowercase: true, unique: true },
+    phone: {
+      type: String,
+      required: true,
+      minlength: 10,
+      maxlength: 15,
+      unique: true,
+    },
+    password: { type: String, required: true, minlength: 8 },
+    gender: { type: String, enum: ["M", "F", "O"] },
+    role: { type: String, required: true, default: "admin" },
+    address: { type: String },
+    avatar: { type: String, required: true, default: "avatar.webp" },
   },
-  email: { type: String, required: true, lowercase: true, unique: true },
-  phone: {
-    type: String,
-    required: true,
-    minlength: 10,
-    maxlength: 15,
-    unique: true,
-  },
-  password: { type: String, required: true, minlength: 8 },
-  gender: { type: String, enum: ["M", "F", "O"] },
-  role: { type: String, required: true, default: "admin" },
-  address: { type: String },
-  avatar: { type: String, required: true, default: "avatar.webp" },
-});
+  { versionKey: false, timestamps: true }
+);
 
 const Admin: Model<TAdmin> = mongoose.model("Admin", adminSchema);
 

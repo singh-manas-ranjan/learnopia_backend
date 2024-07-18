@@ -64,7 +64,7 @@ const courseSchema: Schema<TCourse> = new Schema(
       },
     ],
   },
-  { timestamps: true }
+  { timestamps: true, versionKey: false }
 );
 
 const Course: Model<TCourse> = mongoose.model("Course", courseSchema);
