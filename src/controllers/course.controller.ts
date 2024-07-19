@@ -39,11 +39,7 @@ const getCourseList = async (req: Request, res: Response) => {
   try {
     const courses = await Course.find({}).exec();
     if (courses.length > 0) {
-      res.status(200).json({
-        success: true,
-        message: "Courses found successfully",
-        body: courses,
-      });
+      res.status(200).json(courses);
     } else {
       res
         .status(200)

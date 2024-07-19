@@ -2,27 +2,12 @@ import { Request, Response } from "express";
 import Student, { TStudent } from "../models/student.models";
 
 const registerStudent = async (req: Request, res: Response) => {
-  const {
-    firstName,
-    lastName,
-    email,
-    username,
-    password,
-    phone,
-    gender,
-    qualification,
-  }: TStudent = req.body;
+  const { firstName, lastName, email, username, password, phone }: TStudent =
+    req.body;
   if (
-    [
-      firstName,
-      lastName,
-      email,
-      username,
-      password,
-      phone,
-      gender,
-      qualification,
-    ].some((field) => field?.trim() === "")
+    [firstName, lastName, email, username, password, phone].some(
+      (field) => field?.trim() === ""
+    )
   ) {
     return res
       .status(400)
@@ -40,11 +25,29 @@ const registerStudent = async (req: Request, res: Response) => {
   }
 
   try {
-    const newStudent = await Student.create(req.body);
+    const createdStudent = await Student.create({
+      firstName,
+      lastName,
+      email,
+      phone,
+      username,
+      password,
+    });
+    const resBody = await Student.findById(createdStudent._id).select(
+      "-password"
+    );
+
+    if (!resBody) {
+      return res.status(500).json({
+        success: false,
+        message: "Something went wrong while registering student",
+      });
+    }
+
     res.status(201).json({
       success: true,
       message: "Student Created Successfully",
-      body: newStudent,
+      body: resBody,
     });
   } catch (error) {
     console.log(`ERROR!! registerStudent: ${error}`);
@@ -54,20 +57,33 @@ const registerStudent = async (req: Request, res: Response) => {
 
 const studentLogin = async (req: Request, res: Response) => {
   const { username, password } = req.body;
+  if (!username || !password) {
+    return res
+      .status(400)
+      .json({ success: false, message: "All fields are required" });
+  }
   try {
-    const student = await Student.findOne(
-      { username, password },
-      { username: 0, password: 0 }
-    ).exec();
+    const student = await Student.findOne({ username }).exec();
     if (!student) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Student does not exists" });
+    }
+
+    const isPasswordCorrect = await student.isPasswordCorrect(password);
+
+    if (!isPasswordCorrect) {
       return res
         .status(401)
         .json({ success: false, message: "Invalid Credentials" });
     }
+
+    const resBody = await Student.findById(student._id);
+
     res.status(200).json({
       success: true,
       message: "Student Logged In Successfully",
-      body: student,
+      body: resBody,
     });
   } catch (error) {
     console.log(`ERROR!! studentLogin: ${error}`);
