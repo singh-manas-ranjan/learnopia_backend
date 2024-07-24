@@ -78,7 +78,7 @@ const studentLogin = async (req: Request, res: Response) => {
         .json({ success: false, message: "Invalid Credentials" });
     }
 
-    const resBody = await Student.findById(student._id);
+    const resBody = await Student.findById(student._id, "-password -username");
 
     res.status(200).json({
       success: true,
@@ -91,21 +91,20 @@ const studentLogin = async (req: Request, res: Response) => {
   }
 };
 
-const getStudent = async (req: Request, res: Response) => {
+const getStudentEnrolledCourses = async (req: Request, res: Response) => {
   const id = req.params.id;
+
   try {
-    const student = await Student.findById(id).exec();
+    const student = await Student.findById(id, "enrolledCourses -_id")
+      .populate("enrolledCourses")
+      .exec();
+
     if (!student) {
-      return res.status(404).json({
-        success: false,
-        message: "Student Not Found",
-      });
+      return res
+        .status(404)
+        .json({ success: false, message: "Student does not exists" });
     }
-    res.status(200).json({
-      success: true,
-      message: "Student Found Successfully",
-      body: student,
-    });
+    res.status(200).json({ success: true, body: student.enrolledCourses });
   } catch (error) {
     console.log(`ERROR!! getStudent: ${error}`);
     res.status(500).json({ success: false, message: "Internal Server Error" });
@@ -176,6 +175,7 @@ const getStudentProfile = async (req: Request, res: Response) => {
         updatedAt: 0,
         enrolledCourses: 0,
         password: 0,
+        username: 0,
       }
     ).exec();
     if (!student) {
@@ -192,12 +192,44 @@ const getStudentProfile = async (req: Request, res: Response) => {
   }
 };
 
+const enrollCourses = async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const { courseId }: { courseId: string } = req.body;
+
+  try {
+    const student = await Student.findById(id);
+    if (!student) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Student Not Found" });
+    }
+
+    if (student.enrolledCourses.includes(courseId)) {
+      return res.status(409).json({
+        success: false,
+        message: "Course already enrolled by the student",
+      });
+    }
+
+    student.enrolledCourses.push(courseId);
+    await student.save();
+
+    res
+      .status(200)
+      .json({ success: true, message: "Course enrolled successfully" });
+  } catch (error) {
+    console.error(`ERROR!! enrollCourses: ${error}`);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
 export {
   registerStudent,
   studentLogin,
-  getStudent,
+  getStudentEnrolledCourses,
   getStudentList,
   updateStudent,
   deleteStudent,
   getStudentProfile,
+  enrollCourses,
 };
