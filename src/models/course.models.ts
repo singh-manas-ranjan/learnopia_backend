@@ -19,6 +19,7 @@ export type TCourse = Document & {
   courseImg: string;
   coursePrice: number;
   isPaidCourse: Boolean;
+  aboutCourse: string;
   description: string;
   courseLink: string;
   courseIndex: TCourseContent[];
@@ -35,6 +36,7 @@ const courseSchema: Schema<TCourse> = new Schema(
     coursePrice: { type: Number, required: true, default: 0 },
     isPaidCourse: { type: Boolean, required: true, default: true },
     description: { type: String, required: true },
+    aboutCourse: { type: String, required: true },
     courseLink: { type: String, required: true },
     courseIndex: {
       type: [
