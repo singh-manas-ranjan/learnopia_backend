@@ -29,7 +29,6 @@ const studentSchema: Schema<TStudent> = new Schema(
       required: true,
       unique: true,
       minlength: 5,
-      index: true,
       trim: true,
     },
     email: {
@@ -55,7 +54,12 @@ const studentSchema: Schema<TStudent> = new Schema(
       default: "NA",
     },
     role: { type: String, required: true, default: "student" },
-    avatar: { type: String, required: true, default: "avatar.webp" },
+    avatar: {
+      type: String,
+      required: true,
+      default:
+        "https://res.cloudinary.com/learnopia/image/upload/v1721993573/gni4x3jenf0baovrrrdf.png",
+    },
     address: { type: String, required: true, default: "NA" },
     qualification: {
       type: String,

@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import Student, { TStudent } from "../models/student.models";
+import fs from "fs";
+import { uploadOnCloudinary } from "../utils/cloudinary";
 
 const registerStudent = async (req: Request, res: Response) => {
   const { firstName, lastName, email, username, password, phone }: TStudent =
@@ -197,7 +199,7 @@ const enrollCourses = async (req: Request, res: Response) => {
   const { courseId }: { courseId: string } = req.body;
 
   try {
-    const student = await Student.findById(id);
+    const student: TStudent | null = await Student.findById(id).exec();
     if (!student) {
       return res
         .status(404)
@@ -223,6 +225,43 @@ const enrollCourses = async (req: Request, res: Response) => {
   }
 };
 
+const updateAvatar = async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const localFilePath = req.file?.path;
+  console.log(localFilePath);
+
+  if (!localFilePath) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Avatar file is required" });
+  }
+  try {
+    const student: TStudent | null = await Student.findById(id).exec();
+    if (!student) {
+      fs.unlinkSync(localFilePath);
+      return res
+        .status(404)
+        .json({ success: false, message: "Student Not Found" });
+    }
+    const avatarUrl = await uploadOnCloudinary(localFilePath);
+    if (!avatarUrl) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Avatar file is required" });
+    }
+    student.avatar = avatarUrl;
+    const updatedUser = await student.save();
+    res.status(200).json({
+      success: true,
+      message: "Avatar updated successfully",
+      body: updatedUser,
+    });
+  } catch (error) {
+    console.error(`ERROR!! updateAvatar: ${error}`);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
 export {
   registerStudent,
   studentLogin,
@@ -232,4 +271,5 @@ export {
   deleteStudent,
   getStudentProfile,
   enrollCourses,
+  updateAvatar,
 };

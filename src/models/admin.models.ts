@@ -25,7 +25,6 @@ const adminSchema: Schema<TAdmin> = new Schema(
       required: true,
       minlength: 5,
       unique: true,
-      index: true,
       trim: true,
     },
     email: {
