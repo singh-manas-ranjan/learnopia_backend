@@ -114,7 +114,12 @@ const getStudentEnrolledCourses = async (req: Request, res: Response) => {
 };
 const getStudentList = async (req: Request, res: Response) => {
   try {
-    const students = await Student.find({}).exec();
+    const students = await Student.find()
+      .populate({
+        path: "enrolledCourses",
+        select: "courseName",
+      })
+      .exec();
     if (students.length > 0) {
       res.status(200).json({
         success: true,

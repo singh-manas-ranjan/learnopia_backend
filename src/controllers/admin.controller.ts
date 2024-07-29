@@ -1,6 +1,42 @@
 import Admin, { TAdmin } from "../models/admin.models";
 import { Request, Response } from "express";
 
+const registerAdmin = async (req: Request, res: Response) => {
+  const { firstName, lastName, email, username, password, phone }: TAdmin =
+    req.body;
+  if (
+    [firstName, lastName, email, username, password, phone].some(
+      (field) => field.trim() === ""
+    )
+  ) {
+    return res
+      .status(400)
+      .json({ success: false, message: "All Fields are required" });
+  }
+
+  const isAdminExists = await Admin.findOne({
+    $or: [{ email }, { username }, { phone }],
+  });
+
+  if (isAdminExists) {
+    return res
+      .status(409)
+      .json({ success: false, message: "Admin already exists" });
+  }
+
+  try {
+    const admin = await Admin.create(req.body);
+    res.status(201).json({
+      success: true,
+      message: "Admin Created Successfully",
+      body: admin,
+    });
+  } catch (error) {
+    console.log(`ERROR!! registerAdmin ${error}`);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
 const adminLogin = async (req: Request, res: Response) => {
   const { username, password } = req.body;
   if (!username || !password) {
@@ -85,4 +121,4 @@ const updateAdmin = async (req: Request, res: Response) => {
   }
 };
 
-export { getAdmin, getAdminList, adminLogin, updateAdmin };
+export { registerAdmin, getAdmin, getAdminList, adminLogin, updateAdmin };

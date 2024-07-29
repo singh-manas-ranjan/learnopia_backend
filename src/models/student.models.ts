@@ -58,7 +58,7 @@ const studentSchema: Schema<TStudent> = new Schema(
       type: String,
       required: true,
       default:
-        "https://res.cloudinary.com/learnopia/image/upload/v1721993573/gni4x3jenf0baovrrrdf.png",
+        "https://res.cloudinary.com/learnopia/image/upload/v1722231314/285655_user_icon_jeqpxe.png",
     },
     address: { type: String, required: true, default: "NA" },
     qualification: {

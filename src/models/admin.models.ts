@@ -51,7 +51,12 @@ const adminSchema: Schema<TAdmin> = new Schema(
     },
     role: { type: String, required: true, default: "admin" },
     address: { type: String, required: true, default: "NA" },
-    avatar: { type: String, required: true, default: "avatar.webp" },
+    avatar: {
+      type: String,
+      required: true,
+      default:
+        "https://res.cloudinary.com/learnopia/image/upload/v1722231314/285655_user_icon_jeqpxe.png",
+    },
   },
   { versionKey: false, timestamps: true }
 );
