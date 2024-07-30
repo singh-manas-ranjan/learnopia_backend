@@ -1,5 +1,5 @@
-import { v2 as cloudinary, UploadApiResponse } from "cloudinary";
-import fs from "fs";
+import { v2 as cloudinary } from "cloudinary";
+import { Readable } from "stream";
 import {
   CLOUDINARY_API_KEY,
   CLOUDINARY_API_SECRET,
@@ -12,25 +12,22 @@ cloudinary.config({
   api_secret: CLOUDINARY_API_SECRET,
 });
 
-const uploadOnCloudinary = async (
-  localFilePath: string
-): Promise<string | null> => {
-  try {
-    if (!localFilePath) return null;
-
-    const uploadResult: UploadApiResponse = await cloudinary.uploader.upload(
-      localFilePath,
-      {
-        resource_type: "auto",
+export async function uploadOnCloudinary(
+  buffer: Buffer
+): Promise<string | null> {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { resource_type: "auto" },
+      (error, result) => {
+        if (error) {
+          console.error("Error uploading file:", error);
+          return reject(error);
+        }
+        resolve(result?.url ?? null);
       }
     );
-    fs.unlinkSync(localFilePath);
-    return uploadResult.url;
-  } catch (error) {
-    fs.unlinkSync(localFilePath);
-    console.error("Error uploading file:", error);
-    return null;
-  }
-};
 
-export { uploadOnCloudinary };
+    const stream = Readable.from(buffer);
+    stream.pipe(uploadStream);
+  });
+}

@@ -232,10 +232,10 @@ const enrollCourses = async (req: Request, res: Response) => {
 
 const updateAvatar = async (req: Request, res: Response) => {
   const id = req.params.id;
-  const localFilePath = req.file?.path;
-  console.log(localFilePath);
+  const fileBuffer = req.file?.buffer;
+  console.log(fileBuffer);
 
-  if (!localFilePath) {
+  if (!fileBuffer) {
     return res
       .status(400)
       .json({ success: false, message: "Avatar file is required" });
@@ -243,12 +243,11 @@ const updateAvatar = async (req: Request, res: Response) => {
   try {
     const student: TStudent | null = await Student.findById(id).exec();
     if (!student) {
-      fs.unlinkSync(localFilePath);
       return res
         .status(404)
         .json({ success: false, message: "Student Not Found" });
     }
-    const avatarUrl = await uploadOnCloudinary(localFilePath);
+    const avatarUrl = await uploadOnCloudinary(fileBuffer);
     if (!avatarUrl) {
       return res
         .status(400)
