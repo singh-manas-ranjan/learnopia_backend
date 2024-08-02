@@ -21,7 +21,7 @@ studentRouter.route("/courses/:id").get(getStudentEnrolledCourses);
 studentRouter.route("/courses/:id").patch(enrollCourses);
 studentRouter.route("/profile/:id").get(getStudentProfile);
 studentRouter.route("/avatar/:id").patch(upload.single("avatar"), updateAvatar);
-studentRouter.route("/:id").put(updateStudent);
+studentRouter.route("/:id").patch(updateStudent);
 studentRouter.route("/:id").delete(deleteStudent);
 
 export { studentRouter };

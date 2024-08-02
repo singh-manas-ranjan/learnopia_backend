@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import Student, { TStudent } from "../models/student.models";
-import fs from "fs";
 import { uploadOnCloudinary } from "../utils/cloudinary";
 
 const registerStudent = async (req: Request, res: Response) => {
@@ -48,7 +47,7 @@ const registerStudent = async (req: Request, res: Response) => {
 
     res.status(201).json({
       success: true,
-      message: "Student Created Successfully",
+      message: "Student Registered Successfully",
       body: resBody,
     });
   } catch (error) {
@@ -108,7 +107,7 @@ const getStudentEnrolledCourses = async (req: Request, res: Response) => {
     }
     res.status(200).json({ success: true, body: student.enrolledCourses });
   } catch (error) {
-    console.log(`ERROR!! getStudent: ${error}`);
+    console.log(`ERROR!! getStudentEnrolledCourses: ${error}`);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
@@ -139,10 +138,12 @@ const getStudentList = async (req: Request, res: Response) => {
 const updateStudent = async (req: Request, res: Response) => {
   const id = req.params.id;
   const body = req.body;
+
   try {
-    const updatedStudent = await Student.updateOne({ _id: id }, body, {
-      runValidators: true,
-    }).exec();
+    const updatedStudent = await Student.findOneAndUpdate(
+      { _id: id },
+      body
+    ).exec();
     res.status(200).json({
       success: true,
       message: "Student Updated Successfully",
