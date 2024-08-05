@@ -62,7 +62,7 @@ const studentSchema: Schema<TStudent> = new Schema(
     address: { type: String, required: true, default: "NA" },
     qualification: {
       type: String,
-      enum: ["X", "XII", "G", "UG", "PG", "-NA-"],
+      enum: ["X", "XII", "UG", "PG", "-NA-"],
       default: "-NA-",
     },
     enrolledCourses: [

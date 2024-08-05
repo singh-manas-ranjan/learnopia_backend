@@ -120,24 +120,21 @@ const getPublishedCourses = async (req: Request, res: Response) => {
 
 const getInstructorsList = async (req: Request, res: Response) => {
   try {
-    const instructors = await Instructor.find()
-      .populate({
-        path: "enrolledCourses",
-        select: "courseName",
-      })
-      .exec();
-    if (instructors.length > 0) {
+    const instructor = await Instructor.find().exec();
+    if (instructor.length > 0) {
       res.status(200).json({
         success: true,
         message: "Instructors found successfully",
-        body: instructors,
+        body: instructor,
       });
     } else {
-      res.status(200).json({
-        success: true,
-        message: "Instructors Not Found",
-        body: instructors,
-      });
+      res
+        .status(200)
+        .json({
+          success: true,
+          message: "Students Not Found",
+          body: instructor,
+        });
     }
   } catch (error) {
     console.log(`ERROR !! getInstructorsList ${error}`);
