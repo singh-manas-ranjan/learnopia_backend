@@ -19,7 +19,7 @@ instructorRouter.post("/login", instructorLogin);
 instructorRouter.route("/").get(getInstructorsList);
 instructorRouter.route("/:id").delete(deleteInstructor);
 instructorRouter.route("/profile/:id").get(getInstructorProfile);
-instructorRouter.route("/courses").get(getPublishedCourses);
+instructorRouter.route("/courses/:id").get(getPublishedCourses);
 instructorRouter.route("/:id").patch(updateInstructor);
 instructorRouter
   .route("/avatar/:id")

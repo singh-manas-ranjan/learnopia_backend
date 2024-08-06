@@ -99,19 +99,17 @@ const getPublishedCourses = async (req: Request, res: Response) => {
   const id = req.params.id;
 
   try {
-    const instructorCourses = await Instructor.findById(
-      id,
-      "publishedCourses -_id"
-    )
+    const instructor = await Instructor.findById(id, "publishedCourses -_id")
       .populate("publishedCourses")
       .exec();
 
-    if (!instructorCourses) {
+    if (!instructor) {
       return res
         .status(404)
         .json({ success: false, message: "Instructor does not exists" });
     }
-    res.status(200).json({ success: true, body: instructorCourses });
+
+    res.status(200).json({ success: true, body: instructor.publishedCourses });
   } catch (error) {
     console.log(`ERROR!! getPublishedCourses: ${error}`);
     res.status(500).json({ success: false, message: "Internal Server Error" });
@@ -128,13 +126,11 @@ const getInstructorsList = async (req: Request, res: Response) => {
         body: instructor,
       });
     } else {
-      res
-        .status(200)
-        .json({
-          success: true,
-          message: "Students Not Found",
-          body: instructor,
-        });
+      res.status(200).json({
+        success: true,
+        message: "Students Not Found",
+        body: instructor,
+      });
     }
   } catch (error) {
     console.log(`ERROR !! getInstructorsList ${error}`);
@@ -182,16 +178,17 @@ const deleteInstructor = async (req: Request, res: Response) => {
 const getInstructorProfile = async (req: Request, res: Response) => {
   const id = req.params.id;
   try {
-    const instructor = await Instructor.find(
+    const instructor = await Instructor.findOne(
       { _id: id },
       {
         createdAt: 0,
         updatedAt: 0,
-        enrolledCourses: 0,
         password: 0,
         username: 0,
       }
-    ).exec();
+    )
+      .populate("publishedCourses")
+      .exec();
     if (!instructor) {
       return res
         .status(404)
