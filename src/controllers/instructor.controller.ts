@@ -207,6 +207,8 @@ const getInstructorProfile = async (req: Request, res: Response) => {
 
 const updateAvatar = async (req: Request, res: Response) => {
   const id = req.params.id;
+  console.log("InstructorId: ", id);
+
   const fileBuffer = req.file?.buffer;
   console.log(fileBuffer);
 
@@ -230,6 +232,8 @@ const updateAvatar = async (req: Request, res: Response) => {
     }
     instructor.avatar = avatarUrl;
     const updatedInstructor = await instructor.save();
+    console.log(updateInstructor);
+
     res.status(200).json({
       success: true,
       message: "Avatar updated successfully",

@@ -23,6 +23,6 @@ instructorRouter.route("/courses/:id").get(getPublishedCourses);
 instructorRouter.route("/:id").patch(updateInstructor);
 instructorRouter
   .route("/avatar/:id")
-  .get(upload.single("avatar"), updateAvatar);
+  .patch(upload.single("avatar"), updateAvatar);
 
 export { instructorRouter };

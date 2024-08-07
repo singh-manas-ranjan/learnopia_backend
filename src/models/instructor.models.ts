@@ -2,6 +2,13 @@ import mongoose, { Document, Schema, Model } from "mongoose";
 import bcrypt from "bcrypt";
 import { TCourse } from "./course.models";
 import { BCRYPT_SALT } from "../config";
+
+type TEducation = {
+  degree: string;
+  institution: string;
+  passingYear: string;
+};
+
 export type TInstructor = Document & {
   firstName: string;
   lastName: string;
@@ -13,6 +20,11 @@ export type TInstructor = Document & {
   role: string;
   address: string;
   avatar: string;
+  aboutMe: string;
+  domain: string;
+  languages: string[];
+  services: string[];
+  education: TEducation[];
   publishedCourses: TCourse["_id"][];
   isPasswordCorrect(password: string): Promise<boolean>;
 };
@@ -52,6 +64,19 @@ const instructorSchema: Schema<TInstructor> = new Schema(
     },
     role: { type: String, required: true, default: "instructor" },
     address: { type: String, required: true, default: "NA" },
+    aboutMe: { type: String, default: "I'am an Instructor" },
+    languages: [{ type: String }],
+    services: [{ type: String }],
+    domain: { type: String },
+    education: {
+      type: [
+        {
+          degree: { type: String },
+          institution: { type: String },
+          passingYear: { type: String },
+        },
+      ],
+    },
     avatar: {
       type: String,
       required: true,
