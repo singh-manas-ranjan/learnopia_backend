@@ -9,6 +9,17 @@ type TEducation = {
   passingYear: string;
 };
 
+export type TExperience = {
+  organization: string;
+  role: string;
+  years: string;
+};
+
+export type TAchievement = {
+  title: string;
+  year: string;
+};
+
 export type TInstructor = Document & {
   firstName: string;
   lastName: string;
@@ -25,6 +36,8 @@ export type TInstructor = Document & {
   languages: string[];
   services: string[];
   education: TEducation[];
+  experience: TExperience[];
+  achievements: TAchievement[];
   publishedCourses: TCourse["_id"][];
   isPasswordCorrect(password: string): Promise<boolean>;
 };
@@ -74,6 +87,23 @@ const instructorSchema: Schema<TInstructor> = new Schema(
           degree: { type: String },
           institution: { type: String },
           passingYear: { type: String },
+        },
+      ],
+    },
+    experience: {
+      type: [
+        {
+          organization: { type: String },
+          role: { type: String },
+          years: { type: String },
+        },
+      ],
+    },
+    achievements: {
+      type: [
+        {
+          title: { type: String },
+          year: { type: String },
         },
       ],
     },
