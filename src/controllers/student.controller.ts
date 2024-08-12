@@ -109,8 +109,8 @@ const studentLogin = async (req: Request, res: Response) => {
 
     const cookiesOptions: CookieOptions = {
       httpOnly: true,
-      secure: false,
-      sameSite: "strict",
+      secure: true,
+      sameSite: "none",
     };
 
     return res
