@@ -6,11 +6,13 @@ import {
   getStudentList,
   updateStudent,
   studentLogin,
+  logout,
   getStudentProfile,
   enrollCourses,
   updateAvatar,
 } from "../controllers/student.controller";
 import { upload } from "../middlewares/multer.middleware";
+import { verifyJWT } from "../middlewares/auth.middleware";
 
 const studentRouter: Router = express.Router();
 
@@ -23,5 +25,7 @@ studentRouter.route("/profile/:id").get(getStudentProfile);
 studentRouter.route("/avatar/:id").patch(upload.single("avatar"), updateAvatar);
 studentRouter.route("/:id").patch(updateStudent);
 studentRouter.route("/:id").delete(deleteStudent);
+
+studentRouter.route("/logout").post(verifyJWT, logout);
 
 export { studentRouter };

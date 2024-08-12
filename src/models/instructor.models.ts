@@ -20,6 +20,13 @@ export type TAchievement = {
   year: string;
 };
 
+export type TAddress = {
+  addressLine1: string;
+  addressLine2: string;
+  state: string;
+  country: string;
+};
+
 export type TInstructor = Document & {
   firstName: string;
   lastName: string;
@@ -29,7 +36,7 @@ export type TInstructor = Document & {
   password: string;
   gender: string;
   role: string;
-  address: string;
+  address: TAddress;
   avatar: string;
   aboutMe: string;
   domain: string;
@@ -76,7 +83,14 @@ const instructorSchema: Schema<TInstructor> = new Schema(
       default: "-NA-",
     },
     role: { type: String, required: true, default: "instructor" },
-    address: { type: String, required: true, default: "NA" },
+    address: {
+      type: {
+        addressLine1: { type: String },
+        addressLine2: { type: String },
+        state: { type: String },
+        country: { type: String },
+      },
+    },
     aboutMe: { type: String, default: "I'am an Instructor" },
     languages: [{ type: String }],
     services: [{ type: String }],

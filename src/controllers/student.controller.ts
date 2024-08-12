@@ -1,6 +1,29 @@
-import { Request, Response } from "express";
+import { CookieOptions, Request, Response } from "express";
 import Student, { TStudent } from "../models/student.models";
 import { uploadOnCloudinary } from "../utils/cloudinary";
+import { AuthenticatedRequest } from "../middlewares/auth.middleware";
+
+type TTokens = {
+  access_token: string;
+  refresh_token: string;
+};
+
+const generateAccessAndRefreshToken = async (
+  studentId: string
+): Promise<TTokens> => {
+  try {
+    const student = await Student.findById(studentId);
+    const access_token = student!.generateAccessToken();
+    const refresh_token = student!.generateRefreshToken();
+    student!.refreshToken = refresh_token;
+    await student!.save({ validateBeforeSave: false });
+
+    return { access_token, refresh_token };
+  } catch (error) {
+    console.log(`ERROR!! in generateAccessAndRefreshToken: ${error} `);
+    return { access_token: "", refresh_token: "" };
+  }
+};
 
 const registerStudent = async (req: Request, res: Response) => {
   const { firstName, lastName, email, username, password, phone }: TStudent =
@@ -35,7 +58,7 @@ const registerStudent = async (req: Request, res: Response) => {
       password,
     });
     const resBody = await Student.findById(createdStudent._id).select(
-      "-password"
+      "-password -refreshToken"
     );
 
     if (!resBody) {
@@ -80,18 +103,64 @@ const studentLogin = async (req: Request, res: Response) => {
     }
 
     const resBody = await Student.findById(student._id, "-password -username");
+    const { access_token, refresh_token } = await generateAccessAndRefreshToken(
+      resBody?._id as string
+    );
 
-    res.status(200).json({
-      success: true,
-      message: "Student Logged In Successfully",
-      body: resBody,
-    });
+    const cookiesOptions: CookieOptions = {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
+    };
+
+    return res
+      .status(200)
+      .cookie("accessToken", access_token, cookiesOptions)
+      .cookie("refreshToken", refresh_token, cookiesOptions)
+      .json({
+        success: true,
+        message: "Student Logged In Successfully",
+        body: resBody,
+        tokens: { access_token, refresh_token },
+      });
   } catch (error) {
     console.log(`ERROR!! studentLogin: ${error}`);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
 
+const logout = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    if (req.user) {
+      const { _id } = req.user;
+      await Student.findByIdAndUpdate(
+        _id,
+        {
+          $set: {
+            refreshToken: "",
+          },
+        },
+        {
+          new: true,
+        }
+      );
+
+      const cookiesOptions = {
+        httpOnly: true,
+        secure: true,
+      };
+
+      return res
+        .status(200)
+        .clearCookie("accessToken", cookiesOptions)
+        .clearCookie("refreshToken", cookiesOptions)
+        .json({ success: true, message: "Logged Out Successfully" });
+    }
+  } catch (error) {
+    console.error(`ERROR!! logout: ${error}`);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
 const getStudentEnrolledCourses = async (req: Request, res: Response) => {
   const id = req.params.id;
 
@@ -270,6 +339,7 @@ const updateAvatar = async (req: Request, res: Response) => {
 export {
   registerStudent,
   studentLogin,
+  logout,
   getStudentEnrolledCourses,
   getStudentList,
   updateStudent,

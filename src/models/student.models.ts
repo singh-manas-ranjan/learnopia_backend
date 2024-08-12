@@ -1,7 +1,14 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 import { TCourse } from "./course.models";
 import bcrypt from "bcrypt";
-import { BCRYPT_SALT } from "../config";
+import {
+  ACCESS_TOKEN_EXPIRY,
+  ACCESS_TOKEN_SECRET,
+  BCRYPT_SALT,
+  REFRESH_TOKEN_EXPIRY,
+  REFRESH_TOKEN_SECRET,
+} from "../config";
+import jwt from "jsonwebtoken";
 
 export type TStudent = Document & {
   firstName: string;
@@ -15,8 +22,11 @@ export type TStudent = Document & {
   address: string;
   avatar: string;
   qualification: string;
+  refreshToken: string;
   enrolledCourses: TCourse["_id"][];
   isPasswordCorrect(password: string): Promise<boolean>;
+  generateAccessToken(): string;
+  generateRefreshToken(): string;
 };
 
 const studentSchema: Schema<TStudent> = new Schema(
@@ -65,6 +75,9 @@ const studentSchema: Schema<TStudent> = new Schema(
       enum: ["X", "XII", "UG", "PG", "-NA-"],
       default: "-NA-",
     },
+    refreshToken: {
+      type: String,
+    },
     enrolledCourses: [
       {
         type: Schema.Types.ObjectId,
@@ -83,6 +96,28 @@ studentSchema.pre("save", async function (next) {
 
 studentSchema.methods.isPasswordCorrect = async function (password: string) {
   return await bcrypt.compare(password, this.password);
+};
+
+studentSchema.methods.generateAccessToken = function () {
+  return jwt.sign(
+    {
+      _id: this._id,
+      role: this.role,
+      avatar: this.avatar,
+      email: this.email,
+      username: this.username,
+    },
+    ACCESS_TOKEN_SECRET as jwt.Secret,
+    {
+      expiresIn: ACCESS_TOKEN_EXPIRY,
+    }
+  );
+};
+
+studentSchema.methods.generateRefreshToken = function () {
+  return jwt.sign({ _id: this._id }, REFRESH_TOKEN_SECRET as jwt.Secret, {
+    expiresIn: REFRESH_TOKEN_EXPIRY,
+  });
 };
 
 const Student: Model<TStudent> = mongoose.model("Student", studentSchema);
