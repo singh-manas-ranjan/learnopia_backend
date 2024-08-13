@@ -85,16 +85,17 @@ const instructorSchema: Schema<TInstructor> = new Schema(
     role: { type: String, required: true, default: "instructor" },
     address: {
       type: {
-        addressLine1: { type: String },
-        addressLine2: { type: String },
-        state: { type: String },
-        country: { type: String },
+        addressLine1: { type: String, default: "" },
+        addressLine2: { type: String, default: "" },
+        state: { type: String, default: "" },
+        country: { type: String, default: "" },
       },
+      default: {},
     },
     aboutMe: { type: String, default: "I'am an Instructor" },
     languages: [{ type: String }],
     services: [{ type: String }],
-    domain: { type: String },
+    domain: { type: String, default: "Add Domain" },
     education: {
       type: [
         {
@@ -138,6 +139,7 @@ const instructorSchema: Schema<TInstructor> = new Schema(
 instructorSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next;
   this.password = await bcrypt.hash(this.password, BCRYPT_SALT);
+  next();
 });
 
 instructorSchema.methods.isPasswordCorrect = async function (params: string) {

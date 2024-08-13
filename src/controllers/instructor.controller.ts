@@ -144,7 +144,10 @@ const updateInstructor = async (req: Request, res: Response) => {
   try {
     const updatedInstructor = await Instructor.findOneAndUpdate(
       { _id: id },
-      body
+      body,
+      {
+        new: true,
+      }
     ).exec();
     res.status(200).json({
       success: true,

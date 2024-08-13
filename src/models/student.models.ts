@@ -10,6 +10,13 @@ import {
 } from "../config";
 import jwt from "jsonwebtoken";
 
+export type TAddress = {
+  addressLine1: string;
+  addressLine2: string;
+  state: string;
+  country: string;
+};
+
 export type TStudent = Document & {
   firstName: string;
   lastName: string;
@@ -19,7 +26,7 @@ export type TStudent = Document & {
   password: string;
   gender: string;
   role: string;
-  address: string;
+  address: TAddress;
   avatar: string;
   qualification: string;
   refreshToken: string;
@@ -69,7 +76,16 @@ const studentSchema: Schema<TStudent> = new Schema(
       default:
         "https://res.cloudinary.com/learnopia/image/upload/v1722231314/285655_user_icon_jeqpxe.png",
     },
-    address: { type: String, required: true, default: "NA" },
+    address: {
+      type: {
+        addressLine1: { type: String, default: "" },
+        addressLine2: { type: String, default: " " },
+        state: { type: String, default: " " },
+        country: { type: String, default: " " },
+      },
+      required: true,
+      default: {},
+    },
     qualification: {
       type: String,
       enum: ["X", "XII", "UG", "PG", "-NA-"],

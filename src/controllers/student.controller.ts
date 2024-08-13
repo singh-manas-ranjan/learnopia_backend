@@ -209,10 +209,9 @@ const updateStudent = async (req: Request, res: Response) => {
   const body = req.body;
 
   try {
-    const updatedStudent = await Student.findOneAndUpdate(
-      { _id: id },
-      body
-    ).exec();
+    const updatedStudent = await Student.findOneAndUpdate({ _id: id }, body, {
+      new: true,
+    }).exec();
     res.status(200).json({
       success: true,
       message: "Student Updated Successfully",
