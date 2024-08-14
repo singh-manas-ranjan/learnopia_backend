@@ -2,28 +2,7 @@ import { CookieOptions, Request, Response } from "express";
 import Student, { TStudent } from "../models/student.models";
 import { uploadOnCloudinary } from "../utils/cloudinary";
 import { AuthenticatedRequest } from "../middlewares/auth.middleware";
-
-type TTokens = {
-  access_token: string;
-  refresh_token: string;
-};
-
-const generateAccessAndRefreshToken = async (
-  studentId: string
-): Promise<TTokens> => {
-  try {
-    const student = await Student.findById(studentId);
-    const access_token = student!.generateAccessToken();
-    const refresh_token = student!.generateRefreshToken();
-    student!.refreshToken = refresh_token;
-    await student!.save({ validateBeforeSave: false });
-
-    return { access_token, refresh_token };
-  } catch (error) {
-    console.log(`ERROR!! in generateAccessAndRefreshToken: ${error} `);
-    return { access_token: "", refresh_token: "" };
-  }
-};
+import { generateAccessAndRefreshToken } from "../utils/TokenCreation";
 
 const registerStudent = async (req: Request, res: Response) => {
   const { firstName, lastName, email, username, password, phone }: TStudent =
@@ -102,15 +81,19 @@ const studentLogin = async (req: Request, res: Response) => {
         .json({ success: false, message: "Invalid Credentials" });
     }
 
-    const resBody = await Student.findById(student._id, "-password -username");
     const { access_token, refresh_token } = await generateAccessAndRefreshToken(
-      resBody?._id as string
+      student?._id as string,
+      "student"
+    );
+    const resBody = await Student.findById(
+      student._id,
+      "-password -username -refreshToken"
     );
 
     const cookiesOptions: CookieOptions = {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: false,
+      sameSite: "lax",
     };
 
     return res

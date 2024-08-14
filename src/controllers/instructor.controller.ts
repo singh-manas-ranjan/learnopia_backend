@@ -1,6 +1,7 @@
-import { Request, Response } from "express";
+import { CookieOptions, Request, Response } from "express";
 import Instructor, { TInstructor } from "../models/instructor.models";
 import { uploadOnCloudinary } from "../utils/cloudinary";
+import { generateAccessAndRefreshToken } from "../utils/TokenCreation";
 
 const registerInstructor = async (req: Request, res: Response) => {
   const { firstName, lastName, email, username, password, phone }: TInstructor =
@@ -79,16 +80,31 @@ const instructorLogin = async (req: Request, res: Response) => {
         .json({ success: false, message: "Invalid Credentials" });
     }
 
+    const { access_token, refresh_token } = await generateAccessAndRefreshToken(
+      instructor?._id as string,
+      "instructor"
+    );
     const resBody = await Instructor.findById(
       instructor._id,
-      "-password -username"
+      "-password -username -refreshToken"
     );
 
-    res.status(200).json({
-      success: true,
-      message: "Instructor Logged In Successfully",
-      body: resBody,
-    });
+    const cookiesOptions: CookieOptions = {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    };
+
+    return res
+      .status(200)
+      .cookie("accessToken", access_token, cookiesOptions)
+      .cookie("refreshToken", refresh_token, cookiesOptions)
+      .json({
+        success: true,
+        message: "Instructor Logged In Successfully",
+        body: resBody,
+        tokens: { access_token, refresh_token },
+      });
   } catch (error) {
     console.log(`ERROR!! instructorLogin: ${error}`);
     res.status(500).json({ success: false, message: "Internal Server Error" });

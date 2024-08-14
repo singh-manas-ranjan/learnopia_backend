@@ -1,5 +1,6 @@
 import Admin, { TAdmin } from "../models/admin.models";
-import { Request, Response } from "express";
+import { CookieOptions, Request, Response } from "express";
+import { generateAccessAndRefreshToken } from "../utils/TokenCreation";
 
 const registerAdmin = async (req: Request, res: Response) => {
   const { firstName, lastName, email, username, password, phone }: TAdmin =
@@ -59,16 +60,32 @@ const adminLogin = async (req: Request, res: Response) => {
         .status(401)
         .json({ success: false, message: "Invalid Credentials" });
     }
+    const { access_token, refresh_token } = await generateAccessAndRefreshToken(
+      admin?._id as string,
+      "admin"
+    );
+    const resBody = await Admin.findById(admin._id).select(
+      "-password -username -refreshToken"
+    );
 
-    const resBody = await Admin.findById(admin._id);
+    const cookiesOptions: CookieOptions = {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    };
 
-    res.status(200).json({
-      success: true,
-      message: "Student Logged In Successfully",
-      body: resBody,
-    });
+    return res
+      .status(200)
+      .cookie("accessToken", access_token, cookiesOptions)
+      .cookie("refreshToken", refresh_token, cookiesOptions)
+      .json({
+        success: true,
+        message: "Admin Logged In Successfully",
+        body: resBody,
+        tokens: { access_token, refresh_token },
+      });
   } catch (error) {
-    console.log(`ERROR!! studentLogin: ${error}`);
+    console.log(`ERROR!! adminLogin: ${error}`);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
