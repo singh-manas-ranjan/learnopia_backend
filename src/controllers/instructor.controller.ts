@@ -92,7 +92,7 @@ const instructorLogin = async (req: Request, res: Response) => {
     const cookiesOptions: CookieOptions = {
       httpOnly: true,
       secure: true,
-      sameSite: "strict",
+      sameSite: "none",
     };
 
     return res
