@@ -1,6 +1,13 @@
 import mongoose, { Document, Schema, Model } from "mongoose";
 import bcrypt from "bcrypt";
-import { BCRYPT_SALT } from "../config";
+import {
+  ACCESS_TOKEN_EXPIRY,
+  ACCESS_TOKEN_SECRET,
+  BCRYPT_SALT,
+  REFRESH_TOKEN_EXPIRY,
+  REFRESH_TOKEN_SECRET,
+} from "../config";
+import jwt from "jsonwebtoken";
 
 export type TAdmin = Document & {
   firstName: string;
@@ -13,7 +20,10 @@ export type TAdmin = Document & {
   role: string;
   address: string;
   avatar: string;
+  refreshToken: string;
   isPasswordCorrect(password: string): Promise<boolean>;
+  generateAccessToken(): string;
+  generateRefreshToken(): string;
 };
 
 const adminSchema: Schema<TAdmin> = new Schema(
@@ -57,6 +67,9 @@ const adminSchema: Schema<TAdmin> = new Schema(
       default:
         "https://res.cloudinary.com/learnopia/image/upload/v1722231314/285655_user_icon_jeqpxe.png",
     },
+    refreshToken: {
+      type: String,
+    },
   },
   { versionKey: false, timestamps: true }
 );
@@ -69,6 +82,28 @@ adminSchema.pre("save", async function (next) {
 
 adminSchema.methods.isPasswordCorrect = async function (password: string) {
   return await bcrypt.compare(password, this.password);
+};
+
+adminSchema.methods.generateAccessToken = function () {
+  return jwt.sign(
+    {
+      _id: this._id,
+      role: this.role,
+      avatar: this.avatar,
+      email: this.email,
+      username: this.username,
+    },
+    ACCESS_TOKEN_SECRET as jwt.Secret,
+    {
+      expiresIn: ACCESS_TOKEN_EXPIRY,
+    }
+  );
+};
+
+adminSchema.methods.generateRefreshToken = function () {
+  return jwt.sign({ _id: this._id }, REFRESH_TOKEN_SECRET as jwt.Secret, {
+    expiresIn: REFRESH_TOKEN_EXPIRY,
+  });
 };
 
 const Admin: Model<TAdmin> = mongoose.model("Admin", adminSchema);

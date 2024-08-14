@@ -2,6 +2,7 @@ import { CookieOptions, Request, Response } from "express";
 import Instructor, { TInstructor } from "../models/instructor.models";
 import { uploadOnCloudinary } from "../utils/cloudinary";
 import { generateAccessAndRefreshToken } from "../utils/TokenCreation";
+import { AuthenticatedRequest } from "../middlewares/auth.middleware";
 
 const registerInstructor = async (req: Request, res: Response) => {
   const { firstName, lastName, email, username, password, phone }: TInstructor =
@@ -107,6 +108,40 @@ const instructorLogin = async (req: Request, res: Response) => {
       });
   } catch (error) {
     console.log(`ERROR!! instructorLogin: ${error}`);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+const logout = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    if (req.user) {
+      const { _id } = req.user;
+      await Instructor.findByIdAndUpdate(
+        _id,
+        {
+          $set: {
+            refreshToken: "",
+          },
+        },
+        {
+          new: true,
+        }
+      );
+
+      const cookiesOptions: CookieOptions = {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+      };
+
+      return res
+        .status(200)
+        .clearCookie("accessToken", cookiesOptions)
+        .clearCookie("refreshToken", cookiesOptions)
+        .json({ success: true, message: "Logged Out Successfully" });
+    }
+  } catch (error) {
+    console.error(`ERROR!! logout: ${error}`);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
@@ -273,4 +308,5 @@ export {
   updateAvatar,
   getPublishedCourses,
   deleteInstructor,
+  logout,
 };

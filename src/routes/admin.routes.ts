@@ -5,7 +5,9 @@ import {
   getAdminList,
   adminLogin,
   updateAdmin,
+  logout,
 } from "../controllers/admin.controller";
+import { verifyJWT } from "../middlewares/auth.middleware";
 
 const adminRouter = Router();
 
@@ -14,5 +16,7 @@ adminRouter.route("/login").post(adminLogin);
 adminRouter.route("/").get(getAdminList);
 adminRouter.route("/:id").get(getAdmin);
 adminRouter.route("/:id").put(updateAdmin);
+
+adminRouter.route("/logout").post(verifyJWT, logout);
 
 export { adminRouter };

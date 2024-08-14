@@ -1,6 +1,7 @@
 import Admin, { TAdmin } from "../models/admin.models";
 import { CookieOptions, Request, Response } from "express";
 import { generateAccessAndRefreshToken } from "../utils/TokenCreation";
+import { AuthenticatedRequest } from "../middlewares/auth.middleware";
 
 const registerAdmin = async (req: Request, res: Response) => {
   const { firstName, lastName, email, username, password, phone }: TAdmin =
@@ -70,8 +71,8 @@ const adminLogin = async (req: Request, res: Response) => {
 
     const cookiesOptions: CookieOptions = {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: false,
+      sameSite: "lax",
     };
 
     return res
@@ -86,6 +87,40 @@ const adminLogin = async (req: Request, res: Response) => {
       });
   } catch (error) {
     console.log(`ERROR!! adminLogin: ${error}`);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+const logout = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    if (req.user) {
+      const { _id } = req.user;
+      await Admin.findByIdAndUpdate(
+        _id,
+        {
+          $set: {
+            refreshToken: "",
+          },
+        },
+        {
+          new: true,
+        }
+      );
+
+      const cookiesOptions: CookieOptions = {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+      };
+
+      return res
+        .status(200)
+        .clearCookie("accessToken", cookiesOptions)
+        .clearCookie("refreshToken", cookiesOptions)
+        .json({ success: true, message: "Logged Out Successfully" });
+    }
+  } catch (error) {
+    console.error(`ERROR!! logout: ${error}`);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
@@ -138,4 +173,11 @@ const updateAdmin = async (req: Request, res: Response) => {
   }
 };
 
-export { registerAdmin, getAdmin, getAdminList, adminLogin, updateAdmin };
+export {
+  registerAdmin,
+  getAdmin,
+  getAdminList,
+  adminLogin,
+  updateAdmin,
+  logout,
+};

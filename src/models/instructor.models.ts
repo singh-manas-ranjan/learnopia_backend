@@ -1,7 +1,14 @@
 import mongoose, { Document, Schema, Model } from "mongoose";
 import bcrypt from "bcrypt";
 import { TCourse } from "./course.models";
-import { BCRYPT_SALT } from "../config";
+import jwt from "jsonwebtoken";
+import {
+  ACCESS_TOKEN_EXPIRY,
+  ACCESS_TOKEN_SECRET,
+  BCRYPT_SALT,
+  REFRESH_TOKEN_EXPIRY,
+  REFRESH_TOKEN_SECRET,
+} from "../config";
 
 type TEducation = {
   degree: string;
@@ -47,6 +54,9 @@ export type TInstructor = Document & {
   achievements: TAchievement[];
   publishedCourses: TCourse["_id"][];
   isPasswordCorrect(password: string): Promise<boolean>;
+  refreshToken: string;
+  generateAccessToken(): string;
+  generateRefreshToken(): string;
 };
 
 const instructorSchema: Schema<TInstructor> = new Schema(
@@ -128,6 +138,9 @@ const instructorSchema: Schema<TInstructor> = new Schema(
       default:
         "https://res.cloudinary.com/learnopia/image/upload/v1722231314/285655_user_icon_jeqpxe.png",
     },
+    refreshToken: {
+      type: String,
+    },
     publishedCourses: [{ type: Schema.Types.ObjectId, ref: "Course" }],
   },
   {
@@ -144,6 +157,28 @@ instructorSchema.pre("save", async function (next) {
 
 instructorSchema.methods.isPasswordCorrect = async function (params: string) {
   return await bcrypt.compare(params, this.password);
+};
+
+instructorSchema.methods.generateAccessToken = function () {
+  return jwt.sign(
+    {
+      _id: this._id,
+      role: this.role,
+      avatar: this.avatar,
+      email: this.email,
+      username: this.username,
+    },
+    ACCESS_TOKEN_SECRET as jwt.Secret,
+    {
+      expiresIn: ACCESS_TOKEN_EXPIRY,
+    }
+  );
+};
+
+instructorSchema.methods.generateRefreshToken = function () {
+  return jwt.sign({ _id: this._id }, REFRESH_TOKEN_SECRET as jwt.Secret, {
+    expiresIn: REFRESH_TOKEN_EXPIRY,
+  });
 };
 
 const Instructor: Model<TInstructor> = mongoose.model(

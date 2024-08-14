@@ -38,6 +38,7 @@ import { instructorRouter } from "./routes/instructor.routes";
 
 //routes declaration
 app.use("/api/v1/admin", adminRouter);
+app.use("/api/v1/admin/access", studentRouter);
 app.use("/api/v1/courses", courseRouter);
 app.use("/api/v1/students", studentRouter);
 app.use("/api/v1/instructors", instructorRouter);

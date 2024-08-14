@@ -28,10 +28,12 @@ export const verifyJWT = async (
   res: Response,
   next: NextFunction
 ) => {
+  console.log("Inside verifyJWT Middleware");
   const token =
     req.cookies?.accessToken ||
     req.header("Authorization")?.replace("Bearer ", "");
 
+  console.log(`Logout Token: ${token}`);
   if (!token) {
     return res.status(401).json({
       success: false,
@@ -66,6 +68,65 @@ export const verifyJWT = async (
     req.user = user;
     next();
   } catch (error) {
+    return res
+      .status(401)
+      .json({ success: false, message: "Unauthorized Request" });
+  }
+};
+
+export const verifyAdminOnly = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  console.log("verifyAdminOnly Middleware Triggered");
+
+  // Print entire cookies and headers for debugging
+  console.log("Cookies: ", req.cookies);
+  console.log("Headers: ", req.headers);
+
+  const token =
+    req.cookies?.accessToken ||
+    req.header("Authorization")?.replace("Bearer ", "");
+
+  console.log(`Token: ${token}`);
+
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      message: "Unauthorized Request: No Token Provided",
+    });
+  }
+
+  try {
+    const decodedToken = Jwt.verify(token, ACCESS_TOKEN_SECRET as string);
+    if (!isJwtPayloadWithIdAndRole(decodedToken)) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid Access Token" });
+    }
+
+    const { role } = decodedToken;
+    const Model = roleModelMap[role];
+
+    console.log(`Role: ${role}`);
+
+    if (!Model) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid Access Token" });
+    }
+
+    if (Model !== Admin) {
+      return res
+        .status(403)
+        .json({ success: false, message: "Forbidden Request" });
+    }
+
+    next();
+  } catch (error) {
+    console.log(error);
+
     return res
       .status(401)
       .json({ success: false, message: "Unauthorized Request" });

@@ -92,8 +92,8 @@ const studentLogin = async (req: Request, res: Response) => {
 
     const cookiesOptions: CookieOptions = {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: false,
+      sameSite: "lax",
     };
 
     return res
@@ -128,9 +128,10 @@ const logout = async (req: AuthenticatedRequest, res: Response) => {
         }
       );
 
-      const cookiesOptions = {
+      const cookiesOptions: CookieOptions = {
         httpOnly: true,
         secure: true,
+        sameSite: "none",
       };
 
       return res
@@ -318,6 +319,30 @@ const updateAvatar = async (req: Request, res: Response) => {
   }
 };
 
+const getStudentById = async (req: AuthenticatedRequest, res: Response) => {
+  console.log("Control Inside getStudentById");
+
+  const id = req.params.id;
+  try {
+    const student = await Student.findById(id)
+      .select("-password -accessToken -username")
+      .exec();
+    if (!student) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Student Not Found" });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Student found successfully",
+      body: student,
+    });
+  } catch (error) {
+    console.error(`ERROR!! getStudentById: ${error}`);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
 export {
   registerStudent,
   studentLogin,
@@ -329,4 +354,5 @@ export {
   getStudentProfile,
   enrollCourses,
   updateAvatar,
+  getStudentById,
 };

@@ -8,9 +8,11 @@ import {
   getPublishedCourses,
   updateAvatar,
   updateInstructor,
+  logout,
 } from "../controllers/instructor.controller";
 
 import { upload } from "../middlewares/multer.middleware";
+import { verifyJWT } from "../middlewares/auth.middleware";
 
 const instructorRouter: Router = express.Router();
 
@@ -24,5 +26,7 @@ instructorRouter.route("/:id").patch(updateInstructor);
 instructorRouter
   .route("/avatar/:id")
   .patch(upload.single("avatar"), updateAvatar);
+
+instructorRouter.route("/logout").post(verifyJWT, logout);
 
 export { instructorRouter };

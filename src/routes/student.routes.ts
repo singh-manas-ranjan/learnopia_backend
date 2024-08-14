@@ -10,9 +10,10 @@ import {
   getStudentProfile,
   enrollCourses,
   updateAvatar,
+  getStudentById,
 } from "../controllers/student.controller";
 import { upload } from "../middlewares/multer.middleware";
-import { verifyJWT } from "../middlewares/auth.middleware";
+import { verifyJWT, verifyAdminOnly } from "../middlewares/auth.middleware";
 
 const studentRouter: Router = express.Router();
 
@@ -27,5 +28,7 @@ studentRouter.route("/:id").patch(updateStudent);
 studentRouter.route("/:id").delete(deleteStudent);
 
 studentRouter.route("/logout").post(verifyJWT, logout);
+
+studentRouter.route("/students/:id").get(verifyAdminOnly, getStudentById);
 
 export { studentRouter };
