@@ -30,6 +30,7 @@ export type TStudent = Document & {
   avatar: string;
   qualification: string;
   refreshToken: string;
+  socialLinks: string[];
   enrolledCourses: TCourse["_id"][];
   isPasswordCorrect(password: string): Promise<boolean>;
   generateAccessToken(): string;
@@ -91,6 +92,10 @@ const studentSchema: Schema<TStudent> = new Schema(
       enum: ["X", "XII", "UG", "PG", "-NA-"],
       default: "-NA-",
     },
+    socialLinks: {
+      type: [String],
+      default: [],
+    },
     refreshToken: {
       type: String,
     },
@@ -131,9 +136,13 @@ studentSchema.methods.generateAccessToken = function () {
 };
 
 studentSchema.methods.generateRefreshToken = function () {
-  return jwt.sign({ _id: this._id }, REFRESH_TOKEN_SECRET as jwt.Secret, {
-    expiresIn: REFRESH_TOKEN_EXPIRY,
-  });
+  return jwt.sign(
+    { _id: this._id, role: this.role },
+    REFRESH_TOKEN_SECRET as jwt.Secret,
+    {
+      expiresIn: REFRESH_TOKEN_EXPIRY,
+    }
+  );
 };
 
 const Student: Model<TStudent> = mongoose.model("Student", studentSchema);

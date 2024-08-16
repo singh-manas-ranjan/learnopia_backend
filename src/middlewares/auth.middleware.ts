@@ -17,7 +17,7 @@ const roleModelMap: { [key: string]: any } = {
 };
 
 // Type guard to check if decoded token has _id & role property
-function isJwtPayloadWithIdAndRole(
+export function isJwtPayloadWithIdAndRole(
   payload: JwtPayload | string
 ): payload is JwtPayload & { _id: string; role: string } {
   return typeof payload === "object" && "_id" in payload && "role" in payload;
@@ -33,7 +33,6 @@ export const verifyJWT = async (
     req.cookies?.accessToken ||
     req.header("Authorization")?.replace("Bearer ", "");
 
-  console.log(`Logout Token: ${token}`);
   if (!token) {
     return res.status(401).json({
       success: false,
@@ -51,6 +50,8 @@ export const verifyJWT = async (
 
     const { _id, role } = decodedToken;
     const Model = roleModelMap[role];
+
+    console.log(_id, role);
 
     if (!Model) {
       return res

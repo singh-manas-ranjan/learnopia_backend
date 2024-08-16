@@ -11,6 +11,8 @@ import {
   enrollCourses,
   updateAvatar,
   getStudentById,
+  updatePassword,
+  refreshAccessToken,
 } from "../controllers/student.controller";
 import { upload } from "../middlewares/multer.middleware";
 import { verifyJWT, verifyAdminOnly } from "../middlewares/auth.middleware";
@@ -28,6 +30,10 @@ studentRouter.route("/:id").patch(updateStudent);
 studentRouter.route("/:id").delete(deleteStudent);
 
 studentRouter.route("/logout").post(verifyJWT, logout);
+studentRouter.route("/password").post(verifyJWT, updatePassword);
+
+//Refresh Access-Token
+studentRouter.route("/refresh-token").post(refreshAccessToken);
 
 studentRouter.route("/students/:id").get(verifyAdminOnly, getStudentById);
 

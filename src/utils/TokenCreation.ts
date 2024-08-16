@@ -28,6 +28,6 @@ export const generateAccessAndRefreshToken = async (
     return { access_token, refresh_token };
   } catch (error) {
     console.log(`ERROR!! in generateAccessAndRefreshToken: ${error} `);
-    return { access_token: "", refresh_token: "" };
+    return {} as TTokens;
   }
 };

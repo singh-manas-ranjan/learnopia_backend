@@ -9,6 +9,8 @@ import {
   updateAvatar,
   updateInstructor,
   logout,
+  updatePassword,
+  refreshAccessToken,
 } from "../controllers/instructor.controller";
 
 import { upload } from "../middlewares/multer.middleware";
@@ -27,6 +29,9 @@ instructorRouter
   .route("/avatar/:id")
   .patch(upload.single("avatar"), updateAvatar);
 
+instructorRouter.route("/refresh-token").post(refreshAccessToken);
+
 instructorRouter.route("/logout").post(verifyJWT, logout);
+instructorRouter.route("/password").post(verifyJWT, updatePassword);
 
 export { instructorRouter };
