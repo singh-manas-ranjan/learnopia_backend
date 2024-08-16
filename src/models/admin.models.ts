@@ -101,9 +101,13 @@ adminSchema.methods.generateAccessToken = function () {
 };
 
 adminSchema.methods.generateRefreshToken = function () {
-  return jwt.sign({ _id: this._id }, REFRESH_TOKEN_SECRET as jwt.Secret, {
-    expiresIn: REFRESH_TOKEN_EXPIRY,
-  });
+  return jwt.sign(
+    { _id: this._id, role: this.role },
+    REFRESH_TOKEN_SECRET as jwt.Secret,
+    {
+      expiresIn: REFRESH_TOKEN_EXPIRY,
+    }
+  );
 };
 
 const Admin: Model<TAdmin> = mongoose.model("Admin", adminSchema);

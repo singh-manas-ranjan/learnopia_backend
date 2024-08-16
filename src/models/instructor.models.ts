@@ -176,9 +176,13 @@ instructorSchema.methods.generateAccessToken = function () {
 };
 
 instructorSchema.methods.generateRefreshToken = function () {
-  return jwt.sign({ _id: this._id }, REFRESH_TOKEN_SECRET as jwt.Secret, {
-    expiresIn: REFRESH_TOKEN_EXPIRY,
-  });
+  return jwt.sign(
+    { _id: this._id, role: this.role },
+    REFRESH_TOKEN_SECRET as jwt.Secret,
+    {
+      expiresIn: REFRESH_TOKEN_EXPIRY,
+    }
+  );
 };
 
 const Instructor: Model<TInstructor> = mongoose.model(

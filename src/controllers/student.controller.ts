@@ -333,6 +333,7 @@ const getStudentById = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const student = await Student.findById(id)
       .select("-password -accessToken -username")
+      .populate("enrolledCourses")
       .exec();
     if (!student) {
       return res
