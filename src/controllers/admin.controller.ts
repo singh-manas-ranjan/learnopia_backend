@@ -2,7 +2,12 @@ import Admin, { TAdmin } from "../models/admin.models";
 import { CookieOptions, Request, Response } from "express";
 import { generateAccessAndRefreshToken } from "../utils/TokenCreation";
 import { AuthenticatedRequest } from "../middlewares/auth.middleware";
-import { HTTP_ONLY_COOKIE, SAME_SITE, SECURE_COOKIE } from "../config";
+import {
+  COOKIE_DOMAIN,
+  HTTP_ONLY_COOKIE,
+  SAME_SITE,
+  SECURE_COOKIE,
+} from "../config";
 
 const registerAdmin = async (req: Request, res: Response) => {
   const { firstName, lastName, email, username, password, phone }: TAdmin =
@@ -74,6 +79,7 @@ const adminLogin = async (req: Request, res: Response) => {
       httpOnly: HTTP_ONLY_COOKIE === "true",
       secure: SECURE_COOKIE === "true",
       sameSite: SAME_SITE as "lax" | "strict" | "none" | undefined,
+      domain: COOKIE_DOMAIN,
     };
 
     return res
@@ -112,6 +118,7 @@ const logout = async (req: AuthenticatedRequest, res: Response) => {
         httpOnly: HTTP_ONLY_COOKIE === "true",
         secure: SECURE_COOKIE === "true",
         sameSite: SAME_SITE as "lax" | "strict" | "none" | undefined,
+        domain: COOKIE_DOMAIN,
       };
 
       return res

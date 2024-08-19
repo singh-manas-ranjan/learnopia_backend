@@ -6,6 +6,7 @@ import {
   HTTP_ONLY_COOKIE,
   SECURE_COOKIE,
   SAME_SITE,
+  COOKIE_DOMAIN,
 } from "../config";
 import Admin from "../models/admin.models";
 import Instructor from "../models/instructor.models";
@@ -79,6 +80,7 @@ const refreshAccessToken = async (req: Request, res: Response) => {
       httpOnly: HTTP_ONLY_COOKIE === "true",
       secure: SECURE_COOKIE === "true",
       sameSite: SAME_SITE as "lax" | "strict" | "none" | undefined,
+      domain: COOKIE_DOMAIN,
     };
 
     return res

@@ -13,6 +13,7 @@ const REFRESH_TOKEN_EXPIRY = process.env.REFRESH_TOKEN_EXPIRY;
 const HTTP_ONLY_COOKIE = process.env.HTTP_ONLY_COOKIE;
 const SECURE_COOKIE = process.env.SECURE_COOKIE;
 const SAME_SITE = process.env.SAME_SITE;
+const COOKIE_DOMAIN = process.env.COOKIE_DOMAIN;
 
 export {
   PORT,
@@ -30,4 +31,5 @@ export {
   HTTP_ONLY_COOKIE,
   SECURE_COOKIE,
   SAME_SITE,
+  COOKIE_DOMAIN,
 };
