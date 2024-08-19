@@ -100,6 +100,7 @@ const instructorLogin = async (req: Request, res: Response) => {
       httpOnly: HTTP_ONLY_COOKIE === "true",
       secure: SECURE_COOKIE === "true",
       sameSite: SAME_SITE as "lax" | "strict" | "none" | undefined,
+      partitioned: true,
     };
 
     return res
@@ -138,6 +139,7 @@ const logout = async (req: AuthenticatedRequest, res: Response) => {
         httpOnly: HTTP_ONLY_COOKIE === "true",
         secure: SECURE_COOKIE === "true",
         sameSite: SAME_SITE as "lax" | "strict" | "none" | undefined,
+        partitioned: true,
       };
 
       return res
