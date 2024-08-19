@@ -35,10 +35,11 @@ import { adminRouter } from "./routes/admin.routes";
 import { courseRouter } from "./routes/course.routes";
 import { studentRouter } from "./routes/student.routes";
 import { instructorRouter } from "./routes/instructor.routes";
+import { adminAccessRouter } from "./routes/adminAccess.routes";
 
 //routes declaration
 app.use("/api/v1/admin", adminRouter);
-app.use("/api/v1/admin/access", studentRouter);
+app.use("/api/v1/admin/access", adminAccessRouter);
 app.use("/api/v1/courses", courseRouter);
 app.use("/api/v1/students", studentRouter);
 app.use("/api/v1/instructors", instructorRouter);

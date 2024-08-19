@@ -186,7 +186,7 @@ const getInstructorsList = async (req: Request, res: Response) => {
     } else {
       res.status(200).json({
         success: true,
-        message: "Students Not Found",
+        message: "Instructors Not Found",
         body: instructor,
       });
     }
@@ -393,6 +393,31 @@ const refreshAccessToken = async (req: Request, res: Response) => {
   }
 };
 
+const getInstructorById = async (req: AuthenticatedRequest, res: Response) => {
+  console.log("Control Inside getInstructorById");
+
+  const id = req.params.id;
+  try {
+    const instructor = await Instructor.findById(id)
+      .select("-password -accessToken -username")
+      .populate("publishedCourses")
+      .exec();
+    if (!instructor) {
+      return res
+        .status(404)
+        .json({ success: false, message: "instructor Not Found" });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "instructor found successfully",
+      body: instructor,
+    });
+  } catch (error) {
+    console.error(`ERROR!! getInstructorById: ${error}`);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
 export {
   registerInstructor,
   instructorLogin,
@@ -405,4 +430,5 @@ export {
   logout,
   updatePassword,
   refreshAccessToken,
+  getInstructorById,
 };

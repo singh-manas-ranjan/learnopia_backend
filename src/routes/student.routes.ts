@@ -35,6 +35,4 @@ studentRouter.route("/password").post(verifyJWT, updatePassword);
 //Refresh Access-Token
 studentRouter.route("/refresh-token").post(refreshAccessToken);
 
-studentRouter.route("/students/:id").get(verifyAdminOnly, getStudentById);
-
 export { studentRouter };
