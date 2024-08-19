@@ -3,7 +3,7 @@ import Student, { TStudent } from "../models/student.models";
 import { uploadOnCloudinary } from "../utils/cloudinary";
 import { AuthenticatedRequest } from "../middlewares/auth.middleware";
 import { generateAccessAndRefreshToken } from "../utils/TokenCreation";
-import { HTTP_ONLY_COOKIE, SECURE_COOKIE } from "../config";
+import { HTTP_ONLY_COOKIE, SAME_SITE, SECURE_COOKIE } from "../config";
 
 const registerStudent = async (req: Request, res: Response) => {
   const { firstName, lastName, email, username, password, phone }: TStudent =
@@ -94,6 +94,7 @@ const studentLogin = async (req: Request, res: Response) => {
     const cookiesOptions: CookieOptions = {
       httpOnly: HTTP_ONLY_COOKIE === "true",
       secure: SECURE_COOKIE === "true",
+      sameSite: SAME_SITE as "lax" | "strict" | "none" | undefined,
     };
 
     return res
@@ -131,6 +132,7 @@ const logout = async (req: AuthenticatedRequest, res: Response) => {
       const cookiesOptions: CookieOptions = {
         httpOnly: HTTP_ONLY_COOKIE === "true",
         secure: SECURE_COOKIE === "true",
+        sameSite: SAME_SITE as "lax" | "strict" | "none" | undefined,
       };
 
       return res
