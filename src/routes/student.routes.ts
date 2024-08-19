@@ -10,12 +10,10 @@ import {
   getStudentProfile,
   enrollCourses,
   updateAvatar,
-  getStudentById,
   updatePassword,
-  refreshAccessToken,
 } from "../controllers/student.controller";
 import { upload } from "../middlewares/multer.middleware";
-import { verifyJWT, verifyAdminOnly } from "../middlewares/auth.middleware";
+import { verifyJWT } from "../middlewares/auth.middleware";
 
 const studentRouter: Router = express.Router();
 
@@ -31,8 +29,5 @@ studentRouter.route("/:id").delete(deleteStudent);
 
 studentRouter.route("/logout").post(verifyJWT, logout);
 studentRouter.route("/password").post(verifyJWT, updatePassword);
-
-//Refresh Access-Token
-studentRouter.route("/refresh-token").post(refreshAccessToken);
 
 export { studentRouter };

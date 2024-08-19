@@ -7,7 +7,6 @@ import {
   updateAdmin,
   logout,
   updatePassword,
-  refreshAccessToken,
 } from "../controllers/admin.controller";
 import { verifyJWT } from "../middlewares/auth.middleware";
 
@@ -18,8 +17,6 @@ adminRouter.route("/login").post(adminLogin);
 adminRouter.route("/").get(getAdminList);
 adminRouter.route("/:id").get(getAdmin);
 adminRouter.route("/:id").put(updateAdmin);
-
-adminRouter.route("/refresh-token").post(refreshAccessToken);
 
 adminRouter.route("/logout").post(verifyJWT, logout);
 adminRouter.route("/password").post(verifyJWT, updatePassword);

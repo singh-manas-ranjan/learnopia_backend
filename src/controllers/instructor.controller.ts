@@ -2,16 +2,8 @@ import { CookieOptions, Request, Response } from "express";
 import Instructor, { TInstructor } from "../models/instructor.models";
 import { uploadOnCloudinary } from "../utils/cloudinary";
 import { generateAccessAndRefreshToken } from "../utils/TokenCreation";
-import {
-  AuthenticatedRequest,
-  isJwtPayloadWithIdAndRole,
-} from "../middlewares/auth.middleware";
-import jwt from "jsonwebtoken";
-import {
-  HTTP_ONLY_COOKIE,
-  REFRESH_TOKEN_SECRET,
-  SECURE_COOKIE,
-} from "../config";
+import { AuthenticatedRequest } from "../middlewares/auth.middleware";
+import { HTTP_ONLY_COOKIE, SECURE_COOKIE } from "../config";
 
 const registerInstructor = async (req: Request, res: Response) => {
   const { firstName, lastName, email, username, password, phone }: TInstructor =
@@ -329,70 +321,6 @@ const updatePassword = async (req: AuthenticatedRequest, res: Response) => {
   }
 };
 
-const refreshAccessToken = async (req: Request, res: Response) => {
-  const incomingRefreshToken =
-    req.cookies?.refreshToken ||
-    req.body.refreshToken ||
-    req.header("Authorization")?.replace("Bearer ", "");
-
-  if (!incomingRefreshToken) {
-    return res
-      .status(401)
-      .json({ success: false, message: "Unauthorized Request" });
-  }
-
-  try {
-    const decodedToken = jwt.verify(
-      incomingRefreshToken,
-      REFRESH_TOKEN_SECRET as string
-    );
-    if (!isJwtPayloadWithIdAndRole(decodedToken)) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Invalid Access Token" });
-    }
-
-    const { _id } = decodedToken;
-    const instructor = await Instructor.findById(_id).exec();
-    if (!instructor) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Unauthorized Access" });
-    }
-
-    if (incomingRefreshToken !== instructor?.refreshToken) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Invalid Refresh Access" });
-    }
-
-    const { access_token, refresh_token } = await generateAccessAndRefreshToken(
-      instructor!._id as string,
-      "instructor"
-    );
-
-    const cookiesOptions: CookieOptions = {
-      httpOnly: HTTP_ONLY_COOKIE === "true",
-      secure: SECURE_COOKIE === "true",
-    };
-
-    return res
-      .status(200)
-      .cookie("accessToken", access_token, cookiesOptions)
-      .cookie("refreshToken", refresh_token, cookiesOptions)
-      .json({
-        status: true,
-        body: { accessToken: access_token, refreshToken: refresh_token },
-        message: "Access Token Refreshed",
-      });
-  } catch (error) {
-    console.log(`ERROR!! refreshAccessToken: ${error}`);
-    return res
-      .status(401)
-      .json({ status: false, message: "Invalid Refresh Token" });
-  }
-};
-
 const getInstructorById = async (req: AuthenticatedRequest, res: Response) => {
   console.log("Control Inside getInstructorById");
 
@@ -429,6 +357,5 @@ export {
   deleteInstructor,
   logout,
   updatePassword,
-  refreshAccessToken,
   getInstructorById,
 };
