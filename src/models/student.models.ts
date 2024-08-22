@@ -14,6 +14,7 @@ import { TEducation } from "./instructor.models";
 export type TAddress = {
   addressLine1: string;
   addressLine2: string;
+  city: string;
   state: string;
   country: string;
 };
@@ -83,9 +84,10 @@ const studentSchema: Schema<TStudent> = new Schema(
     address: {
       type: {
         addressLine1: { type: String, default: "" },
-        addressLine2: { type: String, default: " " },
-        state: { type: String, default: " " },
-        country: { type: String, default: " " },
+        addressLine2: { type: String, default: "" },
+        city: { type: String, default: "" },
+        state: { type: String, default: "" },
+        country: { type: String, default: "" },
       },
       required: true,
       default: {},
