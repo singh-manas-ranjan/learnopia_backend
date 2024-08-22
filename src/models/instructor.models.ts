@@ -10,7 +10,7 @@ import {
   REFRESH_TOKEN_SECRET,
 } from "../config";
 
-type TEducation = {
+export type TEducation = {
   degree: string;
   institution: string;
   passingYear: string;
@@ -114,6 +114,7 @@ const instructorSchema: Schema<TInstructor> = new Schema(
           passingYear: { type: String },
         },
       ],
+      default: [],
     },
     experience: {
       type: [

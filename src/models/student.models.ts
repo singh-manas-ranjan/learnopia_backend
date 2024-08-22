@@ -9,6 +9,7 @@ import {
   REFRESH_TOKEN_SECRET,
 } from "../config";
 import jwt from "jsonwebtoken";
+import { TEducation } from "./instructor.models";
 
 export type TAddress = {
   addressLine1: string;
@@ -29,7 +30,9 @@ export type TStudent = Document & {
   address: TAddress;
   avatar: string;
   qualification: string;
+  education: TEducation[];
   refreshToken: string;
+  aboutMe: string;
   socialLinks: string[];
   enrolledCourses: TCourse["_id"][];
   isPasswordCorrect(password: string): Promise<boolean>;
@@ -87,10 +90,21 @@ const studentSchema: Schema<TStudent> = new Schema(
       required: true,
       default: {},
     },
+    aboutMe: { type: String, required: true, default: "I'am a student" },
     qualification: {
       type: String,
       enum: ["X", "XII", "UG", "PG", "-NA-"],
       default: "-NA-",
+    },
+    education: {
+      type: [
+        {
+          degree: { type: String },
+          institution: { type: String },
+          passingYear: { type: String },
+        },
+      ],
+      default: [],
     },
     socialLinks: {
       type: [String],
